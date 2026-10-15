@@ -1,0 +1,9 @@
+target/
+data/patients.json
+data/patients.json.tmp
+.idea/
+.vscode/
+*.iml
+.DS_Store
+*.log
+.env

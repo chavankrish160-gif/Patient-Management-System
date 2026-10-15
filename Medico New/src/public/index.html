@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#173b43">
+    <meta name="description" content="A simple patient record management application.">
+    <title>Patient records | Care Ledger</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/app.js" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="./" aria-label="Care Ledger home">
+            <span class="brand-mark" aria-hidden="true">+</span>
+            <span>Care Ledger<small>Patient records</small></span>
+        </a>
+        <nav aria-label="Main navigation">
+            <a class="nav-link active" href="#records">Patients</a>
+            <button class="button button-primary header-add" type="button" id="add-patient">
+                <span aria-hidden="true">+</span> Add patient
+            </button>
+        </nav>
+    </header>
+
+    <main class="page-shell">
+        <section class="page-intro" aria-labelledby="page-title">
+            <div>
+                <p class="eyebrow">PATIENT DIRECTORY</p>
+                <h1 id="page-title">Patient records</h1>
+                <p class="intro-copy">A clear, secure place to manage your patient registration records.</p>
+            </div>
+            <div class="record-summary" aria-live="polite">
+                <span class="summary-icon" aria-hidden="true">▤</span>
+                <span><strong id="patient-count">—</strong><small>Total patients</small></span>
+            </div>
+        </section>
+
+        <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+
+        <section class="records-panel" id="records" aria-labelledby="records-heading">
+            <div class="panel-heading">
+                <div>
+                    <h2 id="records-heading">All patients</h2>
+                    <p>Review and manage registered patient information.</p>
+                </div>
+                <label class="search-field">
+                    <span class="sr-only">Search by patient name, ID, or phone number</span>
+                    <span class="search-icon" aria-hidden="true">⌕</span>
+                    <input id="patient-search" type="search" placeholder="Search name, ID, phone…" autocomplete="off">
+                </label>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Patient ID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Age</th>
+                            <th scope="col">Gender</th>
+                            <th scope="col">Phone</th>
+                            <th scope="col">Medical problem</th>
+                            <th scope="col">Registration date</th>
+                            <th scope="col" class="actions-heading">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patient-rows"></tbody>
+                </table>
+                <div id="table-state" class="table-state" role="status" aria-live="polite">
+                    <span class="spinner" aria-hidden="true"></span>
+                    <span>Loading patient records…</span>
+                </div>
+            </div>
+        </section>
+        <p class="privacy-note">Use this demonstration with fictional patient information only.</p>
+    </main>
+
+    <dialog id="patient-dialog" class="app-dialog" aria-labelledby="form-title">
+        <form id="patient-form" novalidate>
+            <div class="dialog-heading">
+                <div>
+                    <p class="eyebrow">PATIENT INFORMATION</p>
+                    <h2 id="form-title">Add patient</h2>
+                </div>
+                <button class="icon-button" type="button" data-close="patient-dialog" aria-label="Close form">×</button>
+            </div>
+            <p class="dialog-copy">Fields marked <span aria-hidden="true">*</span> are required.</p>
+            <div id="form-error" class="form-error" role="alert" hidden></div>
+            <div class="form-grid">
+                <label class="field field-wide">
+                    <span>Patient name <b aria-hidden="true">*</b></span>
+                    <input name="patientName" type="text" maxlength="120" autocomplete="name" required>
+                    <small class="field-error" data-error-for="patientName"></small>
+                </label>
+                <label class="field">
+                    <span>Age <b aria-hidden="true">*</b></span>
+                    <input name="age" type="number" min="1" max="130" inputmode="numeric" required>
+                    <small class="field-error" data-error-for="age"></small>
+                </label>
+                <label class="field">
+                    <span>Gender <b aria-hidden="true">*</b></span>
+                    <select name="gender" required>
+                        <option value="">Select gender</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                    </select>
+                    <small class="field-error" data-error-for="gender"></small>
+                </label>
+                <label class="field field-wide">
+                    <span>Mobile number <b aria-hidden="true">*</b></span>
+                    <input name="phone" type="tel" maxlength="20" autocomplete="tel" placeholder="+1 555 010 2040" required>
+                    <small class="field-error" data-error-for="phone"></small>
+                </label>
+                <label class="field field-wide">
+                    <span>Residential address</span>
+                    <textarea name="address" rows="2" maxlength="500" autocomplete="street-address"></textarea>
+                    <small class="field-error" data-error-for="address"></small>
+                </label>
+                <label class="field field-wide">
+                    <span>Medical problem</span>
+                    <textarea name="medicalProblem" rows="2" maxlength="500"></textarea>
+                    <small class="field-error" data-error-for="medicalProblem"></small>
+                </label>
+                <label class="field">
+                    <span>Registration date <b aria-hidden="true">*</b></span>
+                    <input name="admissionDate" type="date" required>
+                    <small class="field-error" data-error-for="admissionDate"></small>
+                </label>
+            </div>
+            <div class="dialog-actions">
+                <button class="button button-quiet" type="button" data-close="patient-dialog">Cancel</button>
+                <button class="button button-primary" type="submit" id="save-patient">Save patient</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="details-dialog" class="app-dialog details-dialog" aria-labelledby="details-title">
+        <div class="dialog-heading">
+            <div>
+                <p class="eyebrow">PATIENT DETAILS</p>
+                <h2 id="details-title">Patient information</h2>
+            </div>
+            <button class="icon-button" type="button" data-close="details-dialog" aria-label="Close details">×</button>
+        </div>
+        <dl id="patient-details" class="details-list"></dl>
+        <div class="dialog-actions">
+            <button class="button button-quiet" type="button" data-close="details-dialog">Close</button>
+        </div>
+    </dialog>
+</body>
+</html>
